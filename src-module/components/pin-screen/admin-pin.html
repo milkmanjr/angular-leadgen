@@ -1,0 +1,43 @@
+<div ng-controller="AdminPinController" class="admin-num-pad">
+    <div class="container-fluid">
+        <!-- header -->
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Enter PIN</h1>
+            </div>
+        </div>
+
+        <!-- back to app button -->
+        <div>
+            <button ng-click="backToApp()" ng-if="leadgen_enabled == false || (leadgenConfig.account && leadgenConfig.staff_code)" class="btn btn-small">Back to App</button>
+            <span ng-if="!leadgenConfig.account && leadgen_enabled" style="color:#b14242;">Leadgen config is missing. Login to fix this issue.</span>
+        </div>
+
+        <!-- password entry -->
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <input type="password" readonly="readonly" ng-model="currentPin" ng-class="{shake: notValid}" />
+            </div>
+        </div>
+
+        <!-- num pad -->
+        <div class="row">
+            <div class="num-pad">
+                <div class="num-pad-number" ng-click="addNumber(n)" ng-repeat="n in [7,8,9,4,5,6,1,2,3,0] track by $index">
+                    {{n}}
+                </div>
+            </div>
+        </div>
+
+        <!-- enter button -->
+        <div class="button-group">
+            <button ng-click="enter()" class="btn btn-lg" ng-class="{'btn-disabled': !currentPin}">Enter</button>
+        </div>
+
+        <!-- clear button -->
+        <div class="button-group">
+            <button ng-click="clear()" class="btn btn-small" ng-class="{'btn-disabled': !currentPin}">Clear</button>
+        </div>
+
+    </div>
+</div>

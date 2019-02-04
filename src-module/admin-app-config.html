@@ -1,0 +1,13 @@
+<div style="margin: 30px; max-width: 400px" align="center" ng-if="!showAdvanced">
+
+    <ul ng-if="appConfig.account && leadgen_enabled" style="list-style:none; margin: 0; padding: 0;" align="left">
+      <div ng-include="'components/leadgen-event-config/leadgenEventConfig.html'"></div>
+    </ul>
+
+    <span ng-if="!appConfig.account">
+       <div class="error-container" style='margin: 30px auto;' align="center">
+          <i class="fa fa-exclamation-triangle" style='font-size: 150px; color: #b14242;' aria-hidden="true"></i>
+          <br />No config was detected!
+      </div>
+    </span>
+</div>

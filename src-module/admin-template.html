@@ -1,0 +1,27 @@
+<div ng-controller="AdminWorkerController"></div>
+
+<div ng-controller="AdminController" class="leadgen-admin" ng-show="$root.leadgen_page == '' || $root.leadgen_page == 'calendar'">
+
+    <div ng-include="'components/pin-screen/admin-pin.html'"  ng-if="!$root.leadgen_admin_pin"></div>
+
+    <div ng-if="$root.leadgen_page == 'calendar'" ng-include="'components/leads-calendar/calendar.html'"></div>
+
+    <div class="main" ng-show="$root.leadgen_admin_pin && $root.leadgen_page != 'calendar'">
+      <div ng-include="'admin-leads.html'"></div>
+
+      <div ng-controller="PackageManagerController" class="footer">
+        <div>Application Version: {{version}}</div>
+        <span>Support phone number: 646-586-5076</span>
+      </div>
+
+    </div>
+</div>
+
+<div ng-controller="AdminTestOverlayController as vm" ng-show="vm.is_test && vm.overlayVisible" class="leadgen-admin-test-warning" align="center">
+  <h2>You are logged in as <strong>"test."</strong> <i class="fa fa-times" ng-click="vm.showOverlay(false)" style="cursor: pointer"></i></h2>
+  <span>Either the event or the username is 'test' related. This isn't good! Access the admin panel to fix this.</span>
+</div>
+
+<div ng-controller="AdminWebviewOverlay as vm" class="leadgen-admin-webview" ng-hide="vm.show_webview === false" ng-click="vm.closeWebview()"></div>
+
+<div class="leadgen-admin-button" ng-controller="AdminButtonController" ng-if="$root.leadgen_page != ''" ng-dblclick="showAdmin()"></div>

@@ -1,0 +1,24 @@
+box: spinifex/electron
+dev:
+  steps:
+    - script:
+      name: Configure Xvfb
+      code: |
+        sudo start-stop-daemon --start --quiet --pidfile /tmp/xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset
+        sleep 5
+        export DISPLAY=:99.0
+    - npm-install
+    - script:
+      name: run compile for all targets
+      code: |
+        npm run build
+build:
+  steps:
+    - npm-install
+#    - npm-test
+
+    - script:
+        name: echo nodejs information
+        code: |
+          echo "node version $(node -v) running"
+          echo "npm version $(npm -v) running"

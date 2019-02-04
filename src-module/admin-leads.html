@@ -1,0 +1,169 @@
+<div class="leadgen-main-container" ng-class="{'leadgen-disabled': !leadgen_enabled}">
+<!--   LOGIN FORM -->
+  <div ng-controller="PackageManagerController" class="leadgen-main-container-cell"  align="center">
+    <div class="options-area" ng-hide="showAdvanced">
+          <div ng-hide="ready"><div class="img-loader"></div></div>
+
+          <div ng-if="ready && !showAdvanced" align="center">
+
+                <!-- Not logged in yet -->
+                <div ng-if="!appConfig.staff_code && appConfig.account && leadgen_enabled" class="container-fluid"  style="max-width: 400px;" align="center">
+                    <div class="row" align="center">
+                        <div class="col-md-12">
+                            <div ng-if="$parent.$parent.loginError" class="alert alert-danger text-left">
+                                Your password and/or username were incorrect.
+                            </div>
+
+                            <div align="left">
+                                <h3>Login</h3>
+                            </div>
+
+                            <form novalidate="novalidate" ng-submit="attemptLogin()">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" ng-model="$parent.$parent.leadgenUsername" force-open-keyboard placeholder="Staff Code" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control"  ng-model="$parent.$parent.leadgenPassword" force-open-keyboard placeholder="Password" />
+                                </div>
+                                <button type="submit" class="btn btn-block login">
+                                  Login
+                                </button>
+                             </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- missing config -->
+                <div ng-if="!appConfig.account && leadgen_enabled" align="center">
+                  Leadgen config is missing. Please correct this before continuing.
+                </div>
+
+                <!-- Logged in mode -->
+                <div ng-if="appConfig.staff_code && leadgen_enabled" align="center" style="margin-top: 20px;">
+                    <div>Logged in as <span style="font-weight:bold;">{{ appConfig.staff_code }} </span> (<a href="javascript:void(0);" ng-click="logout()" style="text-decoration:underline; color: #fff;">logout</a>)</div>
+                    <a class="btn" ng-class="{'btn-danger': appConfig.staff_code == 'test', 'login': appConfig.staff_code != 'test'}" ng-if="ready" href="javascript:void(0);"  ng-click="loadPackage()" style="margin-top: 10px;">
+                      <i ng-if="appConfig.staff_code == 'test'" class="glyphicon glyphicon-warning-sign"></i> Start Application <span ng-if="appConfig.staff_code == 'test'">as Test</span>
+                    </a>
+                    <div ng-if="appConfig.staff_code == 'test'" style="font-size: 10px; margin-top: 10px;">WARNING: you are logged in as test! This isn't good.</div>
+                </div>
+
+                <!-- not using leadgen -->
+                <a class="btn login" ng-if="ready && !leadgen_enabled" href="javascript:void(0);"  ng-click="loadPackage()" style="margin-top: 10px;" align="center">
+                  Start Application
+                </a>
+
+          </div>
+
+          <div ng-if="!appConfig.account && leadgen_enabled" ng-include="'components/leadgen-config/leadgenConfig.html'"></div>
+          <div ng-if="leadgen_enabled" ng-include="'admin-app-config.html'"></div>
+    </div>
+
+    <div ng-if="showAdvanced" ng-include="'components/advanced-options/advancedOptionsTemplate.html'"></div>
+    <br />
+    <a href="javascript:void(0);" ng-click="showAdvanced = true" class="btn btn-small" ng-hide="showAdvanced">Advanced Options</a>
+    <a href="javascript:void(0);" ng-click="showAdvanced = false;" class="btn btn-small" ng-hide="!showAdvanced">Back</a>
+    <div ng-include="'admin-exit.html'"></div>
+  </div>
+
+
+<!--   LEADS FORM -->
+  <div ng-if="currentPage == 'Leads' && leadgen_enabled" ng-controller="AdminLeadsController" class="leadgen-main-container-cell">
+
+    <h2 style="margin-bottom: 0;">All Leads</h2>
+
+    <!--
+      show loading if nothing is ready yet
+    -->
+    <div ng-hide="ready"><div class="img-loader"></div></div>
+
+    <!--
+      show error if something went wrong
+      $scope.error == true
+    -->
+    <div ng-include="'generic-error.html'"></div>
+
+    <!--
+    A quick look at the status
+    of all leads
+    -->
+    <div align="center" class="lead-status" ng-if="ready">
+      <div class="lead-status-item">
+          <h1>{{ leadCounts.synced || 0 }}</h1>
+          <span>SYNCED LEADS</span>
+      </div>
+
+      <div class="lead-status-item">
+        <h1>{{ leadCounts.unsynced || 0 }}</h1>
+        <span>UNSYNCED LEADS</span>
+      </div>
+      <div align="center">
+        <a href="javascript:void(0);" ng-click="$root.leadgen_page = 'calendar'" class="btn btn-default btn-sm">Details</a>
+      </div>
+    </div>
+
+    <!--
+      synced breakdown by event_code
+    -->
+    <table ng-if="ready" class="lead-table lead-breakdown-table" width="100%">
+      <thead>
+        <th class="text-center">Event</th>
+        <th class="text-center">Synced</th>
+        <th class="text-center">Unsynced</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="event in leadCounts.byEvent">
+            <td>{{ event.event_code || 'Not Set' }}</td>
+            <td>{{ event.synced || 0 }}</td>
+            <td>{{ event.unsynced || 0 }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div ng-if="syncing" align="center">
+      Syncing leads, please wait...
+      <span>{{ currentSyncLead }}</span>
+    </div>
+
+    <!--
+     Lead sync area. Only shows if they are leads to sync
+    -->
+    <div ng-if="ready && leads && leads.length > 0">
+
+        <h2 style="margin: 60px auto 0;">Unsynced Leads</h2>
+
+        <button class="btn" ng-click="manualSync()">Sync Leads</button>
+
+        <!--
+        List of all the leads waiting to be synced
+        -->
+        <table ng-if="ready" width="100%" class="lead-table">
+          <thead>
+            <th>ID</th>
+            <th>Event Code</th>
+            <th>Captured</th>
+            <th>Synced</th>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>{{ leads[0]._id }}</td>
+              <td>{{ leads[0].event_code }}</td>
+              <td>{{ leads[0].captime }}</td>
+              <td>{{ leads[0].synced ? 'YES' : 'NO' }}</td>
+            </tr>
+            <tr ng-if="leads.length > 1">
+              <td colspan="4">
+                and {{ leads.length - 1}} more lead<span ng-if="(leads.length - 1) > 1">s</span> ...
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+    </div>
+
+    <div align="center" ng-if="ready && leads && leads.length == 0 && event && event.length > 0">
+      All leads synced.
+    </div>
+
+  </div>
+</div>

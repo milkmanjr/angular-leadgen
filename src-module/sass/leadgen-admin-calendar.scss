@@ -1,0 +1,165 @@
+$table_border_color: #4da283;
+
+.leadgen-admin-calendar {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    justify-content: center;
+
+    .leadgen-admin-calendar__header {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .leadgen-admin-calendar__inner {
+        h2 {
+            margin: 0;
+            color: #fff;
+        }
+
+        width: 100%;
+        max-width: 900px;
+        margin: 10px;
+    }
+
+    .leadgen-admin-calendar__dayview {
+        min-height: 500px;
+
+        h3 {
+            background: #428c71;
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            padding: 5px 0;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+            margin-bottom: 0;
+        }
+
+        table th[title] {
+            border-bottom: 2px solid #428c71;
+        }
+
+        table .ng-table-filters {
+            display: none;
+        }
+
+        .table>tbody>tr>td,
+        .table>tbody>tr>th,
+        .table>tfoot>tr>td,
+        .table>tfoot>tr>th,
+        .table>thead>tr>td,
+        .table>thead>tr>th {
+            border-top: 1px solid #479075;
+            background: rgba(0,0,0,0.05);
+            color: #fff;
+            box-shadow: none;
+            display: table-cell;
+            position: static;
+        }
+
+        .pagination {
+            margin: 0;
+        }
+
+        .pagination>.disabled>a,
+        .pagination>.disabled>a:focus,
+        .pagination>.disabled>a:hover,
+        .pagination>.disabled>span,
+        .pagination>.disabled>span:focus,
+        .pagination>.disabled>span:hover {
+            color: #449276;
+            cursor: not-allowed;
+            background-color: #4da283;
+            border-color: #4da283;
+        }
+
+        .pagination>.active>a,
+        .pagination>.active>a:focus,
+        .pagination>.active>a:hover,
+        .pagination>.active>span,
+        .pagination>.active>span:focus,
+        .pagination>.active>span:hover {
+            z-index: 3;
+            color: #fff;
+            cursor: default;
+            background-color: #33775e;
+            border-color: #4da283;
+        }
+
+        .pagination>li>a,
+        .pagination>li>span {
+            background-color: #428c71;
+            border: 1px solid #4da283;
+            color: #fff;
+        }
+
+        .ng-table-counts {
+            display: none;
+        }
+
+
+    }
+
+    mwl-calendar {
+        .cal-month-box .cal-row-fluid, mwl-calendar .cal-year-box .row,
+        .cal-month-box [class*=cal-cell], mwl-calendar .cal-year-box [class*=span],
+        .cal-month-box, mwl-calendar .cal-week-box, mwl-calendar .cal-year-box,
+         #cal-week-box {
+            border: none;
+        }
+
+        .cal-row-head [class*=cal-cell],
+        .cal-row-head [class*=cal-cell]:first-child {
+            background: #428c71;
+            color: #fff;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.25);
+        }
+
+        .cal-day-outmonth{
+            opacity: 0.8;
+            .counts {
+                display: none;
+            }
+        }
+
+        .cal-month-day {
+            .counts {
+                color: #fff;
+            }
+        }
+
+        .cal-row-fluid {
+            &.cal-row-head {
+               background: none;
+            }
+
+            &:hover,
+            &:active {
+                   .counts { color: #111; }
+            }
+        }
+
+        .cal-day-today .counts {
+            color: #222;
+        }
+
+        #cal-week-box {
+            left: -70px;
+            top: 0;
+            padding: 10px;
+            background: transparent;
+            text-align: center;
+        }
+
+        .cal-month-day {
+            background: -webkit-linear-gradient(45deg, rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.05) 1%,rgba(0,0,0,0) 100%);
+        }
+
+        .cal-day-today {
+            background: #e8fde7;
+        }
+
+    }
+}

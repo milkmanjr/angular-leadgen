@@ -1,0 +1,33 @@
+<html ng-app="demo">
+  <head>
+    <meta charset="utf-8">
+    <script src="../tests/lib/jquery/jquery.js"></script>
+    <script src="../tests/lib/angular/angular.js"></script>
+    <script src="../dist-module/angular-leadgen-min.js"></script>
+    <title>Tests</title>
+    <script type="text/javascript">
+        window.app = angular.module('demo', ['angular-leadgen'])
+                .config(function (LeadServiceProvider) {
+                    LeadServiceProvider.setConfig({
+                        home_path: require('path').join(__dirname, './'),
+                        sweepstakes_base: 'http://public.gpjconnect.com/acura/photoapp',
+                        device_code: 'acura_master',
+                        vehicle_make: 'acura',
+                        inactivity_callback: ($injector) => {
+                            let $rootScope  = $injector.get("$rootScope");
+                            $rootScope.page = 'donuts';
+                        }
+                    });
+
+                })
+                .run(function ($injector) {
+                    window.ang = {};
+                    window.ang.LeadService   = $injector.get('LeadService');
+                    window.ang.ConfigService = $injector.get('ConfigService');
+                });
+    </script>
+  </head>
+  <body>
+    <script charset="utf-8">require('babel-register'); require('electron-tap/renderer.js');</script>
+  </body>
+</html>

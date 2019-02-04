@@ -1,0 +1,45 @@
+{
+  "name": "angular-leadgen",
+  "authors": [
+    "Malcolm Tyson <malcolm.tyson@spinifexgroup.com>"
+  ],
+  "description": "Leadgen module for angular",
+  "main": [
+    "dist-module/angular-leadgen-min.js",
+    "dist-module/angular-leadgen.css",
+    "dist-module/Avenir-Medium.eot",
+    "dist-module/Avenir-Medium.ttf",
+    "dist-module/Avenir-Medium.woff"
+  ],
+  "keywords": [
+    "angular",
+    "leadgen",
+    "spinifex",
+    "lg3"
+  ],
+  "license": "MIT",
+  "homepage": "http://spinifexgroup.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8",
+    "chosen": "https://github.com/milkmanjr/chosen.git#v1.6.7",
+    "angular-chosen-localytics": "^1.4.2",
+    "jquery": "~2.0",
+    "angular-bootstrap": "^2.0.2",
+    "components-font-awesome": "4.6.3",
+    "moment": "^2.14.1",
+    "angular-sanitize": "1.5.8",
+    "angular-bind-html-compile": "^1.3.0",
+    "angular-PubSub": "angular.pubsub#^1.0.0"
+  },
+  "devDependencies": {
+    "bootstrap-css-only": "^3.3.6"
+  }
+}

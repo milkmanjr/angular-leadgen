@@ -1,0 +1,17 @@
+<h3>{{ vm.selectedDate.format('MMMM Do') }} &mdash; {{ vm.leads.length }} Lead<span ng-if="vm.leads.length != 1">s</span></h3>
+
+<table ng-table="vm.tableParams" class="table" show-filter="true">
+    <tr ng-repeat="lead in $data">
+
+        <td title="'Event'" sortable="'event_code'">
+            {{lead.event_code}}</td>
+
+        <td title="'Timestamp'" sortable="'captime'">
+            {{ lead.captime }}</td>
+
+        <td title="'ID'" sortable="'_id'">
+            {{lead._id}}</td>
+
+        <td title="'Synced'" sortable="'synced'">{{lead.synced ? 'Yes': 'No' }}</td>
+    </tr>
+</table>

@@ -1,0 +1,29 @@
+
+
+.advanced-pills {
+     max-width: 400px;
+     margin: 0 auto;
+
+    details {
+        text-align: left;
+        text-align: left;
+        padding: 0;
+        border-bottom: 1px solid rgba(0,0,0,0.25);
+
+        summary {
+            padding: 10px 0;
+        }
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+
+        .advanced-pill-content {
+            margin: 0 0 30px;
+            padding: 15px;
+            background: rgba(0,0,0,0.10);
+            /* background-color: white; */
+            box-sizing: border-box;
+        }
+    }
+}

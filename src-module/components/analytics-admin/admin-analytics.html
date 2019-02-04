@@ -1,0 +1,96 @@
+<div ng-if="currentPage == 'Analytics'" ng-controller="AdminAnalyticsController">
+
+  <h2 style="margin-bottom: 0;">Analytics</h2>
+
+  <!--
+    show loading if nothing is ready yet
+  -->
+  <div ng-hide="ready"><div class="img-loader"></div></div>
+
+  <!--
+    show error if something went wrong
+    $scope.error == true
+  -->
+  <div ng-include="'generic-error.html'"></div>
+
+  <!--
+  A quick look at the status
+  of all analytics
+  -->
+  <div align="center" class="lead-status" ng-if="ready">
+    <div class="lead-status-item">
+        <h1>{{ analyticCounts.synced || 0 }}</h1>
+        <span>SYNCED</span>
+    </div>
+
+    <div class="lead-status-item">
+      <h1>{{ analyticCounts.unsynced || 0 }}</h1>
+      <span>UNSYNCED</span>
+    </div>
+  </div>
+
+  <!--
+    synced breakdown by event_code
+  -->
+  <table ng-if="ready" class="lead-table lead-breakdown-table" width="100%">
+    <thead>
+      <th class="text-center">Event</th>
+      <th class="text-center">Synced</th>
+      <th class="text-center">Unsynced</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="event in analyticCounts.byEvent">
+          <td>{{ event.event_code || 'Not Set' }}</td>
+          <td>{{ event.synced || 0 }}</td>
+          <td>{{ event.unsynced || 0 }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div ng-if="syncing" align="center">
+    Syncing analytics, please wait...
+    <span>{{ currentSyncAnalytic }}</span>
+  </div>
+
+  <!--
+   Lead sync area. Only shows if they are leads to sync
+  -->
+  <div ng-if="ready && analytics && analytics.length > 0">
+
+      <h2 style="margin: 60px auto 0;">Unsynced Analytics</h2>
+
+      <button class="btn" ng-click="manualSync()">Sync Analytics</button>
+
+      <!--
+      List of all the analytics waiting to be synced
+      -->
+      <table ng-if="ready" width="100%" class="lead-table">
+        <thead>
+          <th>ID</th>
+          <th>Event Code</th>
+          <th>Captured</th>
+          <th>Synced</th>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>{{ analytics[0]._id }}</td>
+            <td>{{ analytics[0].event_code }}</td>
+            <td>{{ analytics[0].captime }}</td>
+            <td>{{ analytics[0].synced ? 'YES' : 'NO' }}</td>
+          </tr>
+          <tr ng-if="analytics.length > 1">
+            <td colspan="4">
+              and {{ analytics.length - 1}} more leads ...
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+  </div>
+
+  <div align="center" ng-if="ready && analytics && analytics.length == 0">
+    All analytics synced.
+  </div>
+
+</div>

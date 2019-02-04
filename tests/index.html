@@ -1,0 +1,26 @@
+<html ng-app="demo">
+    <head>
+        <title>Demo</title>
+        <script src="./lib/angular/angular.js"></script>
+        <script src="../dist-module/angular-leadgen.js"></script>
+        <script>
+            var app = angular.module('demo', ['angular-leadgen']);
+
+            /*app.config(['LeadServiceProvider', function(LeadServiceProvider) {
+
+            }]);*/
+
+            app.controller('DemoController', ['LeadService', '$scope', '$log',
+                function (LeadService, $scope, $log) {
+            }]);
+
+        </script>
+    </head>
+    <body>
+
+        <div ng-controller="DemoController">
+
+        </div>
+
+    </body>
+</html>

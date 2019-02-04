@@ -1,0 +1,53 @@
+
+<div class="options-area" ng-controller="AdvancedOptionsController as vm">
+  <h2>Advanced</h2>
+
+  <div align="center" ng-if="vm.onWindows">
+    <span class="label" ng-class="{'label-success': vm.startedViaBat, 'label-danger': !vm.startedViaBat}">{{ vm.startedViaBat ? 'Started via bat' : 'Not started via bat!' }}</span>
+  </div>
+
+  <div class="advanced-pills">
+    <details ng-if="boot_enabled">
+      <summary>Start Application on System Boot</summary>
+      <div class="advanced-pill-content">
+        <div ng-include="'components/app-auto-booter/appAutoBooter.html'"></div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Skip PIN Screen on Launch</summary>
+      <div class="advanced-pill-content">
+          <div ng-include="'components/app-config/appConfig.html'"></div>
+      </div>
+    </details>
+
+    <details ng-hide="!timeouts_enabled">
+      <summary>Inactivity Timeout</summary>
+      <div class="advanced-pill-content">
+        <div ng-include="'components/inactivity-timeout-config/timeoutConfig.html'"></div>
+      </div>
+    </details>
+
+    <details ng-hide="!packages_enabled">
+      <summary>Packages</summary>
+        <div class="advanced-pill-content" align="center">
+            <a style="margin-top: 10px;" class="btn" ng-click="getLatestPackage()" ng-class="{'btn-disabled': !$root.online}" align="center">Get Latest Package</a>
+        </div>
+    </details>
+
+    <details ng-if="leadgen_enabled">
+      <summary>Leadgen</summary>
+        <div class="advanced-pill-content" align="center">
+            <div ng-include="'components/leadgen-config/leadgenConfig.html'"></div>
+        </div>
+    </details>
+
+     <details ng-repeat="tab in customTabs">
+       <summary>{{ tab.name }}</summary>
+       <div class="advanced-pill-content">
+          <div bind-html-compile="tab.template"></div>
+      </div>
+     </details>
+  </div>
+
+</div>

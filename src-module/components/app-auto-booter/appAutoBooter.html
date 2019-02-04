@@ -1,0 +1,37 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12" ng-controller="appAutoBooterController as vm" ng-class="{dim: !vm.ready}">
+            <form class="form-inline" ng-submit="vm.save();">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="alert alert-success" ng-if="vm.message">
+                            {{vm.message}}
+                        </div>
+                        <div class="alert alert-danger" ng-if="vm.errorMessage">
+                            {{vm.errorMessage}}
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label">
+                                Auto-start app when device boots?
+                            </div>
+                            <label style="margin-right: 70px">
+                                <input type="radio" ng-model="vm.enabled" value="1" /> Yes
+                            </label>
+                            <label>
+                                <input type="radio" ng-model="vm.enabled" value="0" /> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center col-xs-12">
+                        <br />
+                        <button type="submit" class="btn">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+<div ng-controller="AppConfigController">
+
+    <div ng-if="flashMessage" class="alert alert-warning">
+        {{ flashMessage }}
+    </div>
+
+    <div align="center">
+        <div ng-hide="ready" align="center"><div class="img-loader"></div></div>
+    </div>
+
+    <div ng-hide="!ready">
+        <label style="margin: 5px auto 25px;">
+            <input type="checkbox" ng-model="appConfig.autostart" name="autostart" /> Don't show the PIN screen when the app starts
+        </label>
+
+        <br />
+
+        <div align="center">
+            <a
+            class="btn"
+            align="center"
+            ng-click="saveConfig()"
+            ng-click="saveChanges()"
+            type="button">Save</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,7 @@
+<div class="close-btn" ng-click="vm.close()"><i class="fa fa-times"></i></div>
+<div class="zoom-in" ng-click="vm.zoomIn()" ng-class="{disabled: vm.zoomLevel >= vm.zoomUpperLimit}"></div>
+<div class="zoom-out" ng-click="vm.zoomOut()" ng-class="{disabled: vm.zoomLevel <= vm.zoomLowerLimit}"></div>
+
+<div class="modal-body">
+    <div class="img-ctn"><img ng-src="{{ vm.sticker }}" style="width: {{vm.zoomLevel}}%;" class="sticker" /></div>
+</div>

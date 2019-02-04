@@ -1,0 +1,780 @@
+<div ng-controller="AdminWorkerController"></div>
+
+<div ng-controller="AdminController" class="leadgen-admin" ng-show="$root.leadgen_page == '' || $root.leadgen_page == 'calendar'">
+
+    <div ng-if="!$root.leadgen_admin_pin">
+<!-- ngInclude: 'components/pin-screen/admin-pin.html' -->
+<div ng-controller="AdminPinController" class="admin-num-pad">
+    <div class="container-fluid">
+        <!-- header -->
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Enter PIN</h1>
+            </div>
+        </div>
+
+        <!-- back to app button -->
+        <div>
+            <button ng-click="backToApp()" ng-if="leadgen_enabled == false || (leadgenConfig.account && leadgenConfig.staff_code)" class="btn btn-small">Back to App</button>
+            <span ng-if="!leadgenConfig.account && leadgen_enabled" style="color:#b14242;">Leadgen config is missing. Login to fix this issue.</span>
+        </div>
+
+        <!-- password entry -->
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <input type="password" readonly="readonly" ng-model="currentPin" ng-class="{shake: notValid}">
+            </div>
+        </div>
+
+        <!-- num pad -->
+        <div class="row">
+            <div class="num-pad">
+                <div class="num-pad-number" ng-click="addNumber(n)" ng-repeat="n in [7,8,9,4,5,6,1,2,3,0] track by $index">
+                    {{n}}
+                </div>
+            </div>
+        </div>
+
+        <!-- enter button -->
+        <div class="button-group">
+            <button ng-click="enter()" class="btn btn-lg" ng-class="{'btn-disabled': !currentPin}">Enter</button>
+        </div>
+
+        <!-- clear button -->
+        <div class="button-group">
+            <button ng-click="clear()" class="btn btn-small" ng-class="{'btn-disabled': !currentPin}">Clear</button>
+        </div>
+
+    </div>
+</div>
+<!--/ngInclude: 'components/pin-screen/admin-pin.html' -->
+</div>
+
+    <div ng-if="$root.leadgen_page == 'calendar'">
+<!-- ngInclude: 'components/leads-calendar/calendar.html' -->
+<div>
+<!-- ngInclude: 'components/leads-calendar/day-cell.html' -->
+<script id="customMonthCell.html" type="text/ng-template">
+  <div
+      class="cal-month-day"
+      ng-class="{
+        'cal-day-outmonth': !day.inMonth,
+        'cal-day-inmonth': day.inMonth,
+        'cal-day-weekend': day.isWeekend,
+        'cal-day-past': day.isPast,
+        'cal-day-today': day.isToday,
+        'cal-day-future': day.isFuture,
+        'cal-day-selected': vm.dateRangeSelect && vm.dateRangeSelect.startDate <= day.date && day.date <= vm.dateRangeSelect.endDate,
+        'cal-day-open': dayIndex === vm.openDayIndex
+      }">
+
+    <span
+      class="pull-right"
+      data-cal-date
+      ng-bind="day.label">
+    </span>
+
+    <small class="counts" style="position: absolute; bottom: 0; left: 0; padding: 10px" ng-if="day.events.length">
+        {{ day.events[0].title.total }} <span>LEAD<span ng-if="day.events[0].title.total > 1">S</span></span>
+        <div>
+          <span ng-repeat="(key, value) in day.events[0].title.events" class="label label-success" >{{ key }}</span>
+        </div>
+    </small>
+
+  </div>
+</script>
+<!--/ngInclude: 'components/leads-calendar/day-cell.html' -->
+</div>
+
+<div ng-controller="LeadsCalendarController as vm" class="leadgen-admin-calendar">
+    <div class="leadgen-admin-calendar__inner" ng-class="{in_dayview: vm.dayMode}">
+        <table class="leadgen-admin-calendar__header" width="100%">
+            <tr>
+                <td width="250" align="left">
+                    <button class="btn btn-sm" decrement="vm.calendarView" ng-hide="vm.dayMode" mwl-date-modifier="" date="vm.viewDate" ng-click="vm.dateChanged()"><i class="fa fa-chevron-left"></i></button>
+                     <button class="btn btn-sm" ng-if="vm.dayMode" ng-click="vm.dayMode = false;">
+                        <i class="fa fa-chevron-left"></i> Back to Full Calendar
+                    </button>
+                </td>
+                <td align="center"><h2 class="text-center">{{ vm.calendarTitle }}</h2></td>
+                <td width="250" align="right">
+                    <button ng-click="$root.leadgen_page = ''" class="btn btn-sm btn-danger"><i class="fa fa-close"></i> Close</button>
+                    <button class="btn btn-sm" increment="vm.calendarView" ng-hide="vm.dayMode" mwl-date-modifier="" date="vm.viewDate" ng-click="vm.dateChanged()">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                </td>
+            </tr>
+        </table>
+
+        <div class="leadgen-admin-calendar__dayview" ng-if="vm.dayMode">
+<!-- ngInclude: 'components/leads-calendar/day.html' -->
+<h3>{{ vm.selectedDate.format('MMMM Do') }} &mdash; {{ vm.leads.length }} Lead<span ng-if="vm.leads.length != 1">s</span></h3>
+
+<table ng-table="vm.tableParams" class="table" show-filter="true">
+    <tr ng-repeat="lead in $data">
+
+        <td title="'Event'" sortable="'event_code'">
+            {{lead.event_code}}</td>
+
+        <td title="'Timestamp'" sortable="'captime'">
+            {{ lead.captime }}</td>
+
+        <td title="'ID'" sortable="'_id'">
+            {{lead._id}}</td>
+
+        <td title="'Synced'" sortable="'synced'">{{lead.synced ? 'Yes': 'No' }}</td>
+    </tr>
+</table>
+<!--/ngInclude: 'components/leads-calendar/day.html' -->
+</div>
+
+        <mwl-calendar events="vm.events" view="vm.calendarView" view-title="vm.calendarTitle" view-date="vm.viewDate" on-event-click="vm.eventClicked(calendarEvent)" on-timespan-click="vm.onTimespanClick(calendarDate)" on-event-times-changed="vm.eventTimesChanged(calendarEvent); calendarEvent.startsAt = calendarNewEventStart; calendarEvent.endsAt = calendarNewEventEnd" cell-is-open="vm.cellIsOpen" day-view-start="06:00" day-view-end="22:59" day-view-split="30" custom-template-urls="{calendarMonthCell: 'customMonthCell.html'}" cell-modifier="vm.modifyCell(calendarCell)" ng-show="!vm.dayMode" cell-auto-open-disabled="true">
+        </mwl-calendar>
+    </div>
+</div>
+<!--/ngInclude: 'components/leads-calendar/calendar.html' -->
+</div>
+
+    <div class="main" ng-show="$root.leadgen_admin_pin && $root.leadgen_page != 'calendar'">
+      <div>
+<!-- ngInclude: 'admin-leads.html' -->
+<div class="leadgen-main-container" ng-class="{'leadgen-disabled': !leadgen_enabled}">
+<!--   LOGIN FORM -->
+  <div ng-controller="PackageManagerController" class="leadgen-main-container-cell" align="center">
+    <div class="options-area" ng-hide="showAdvanced">
+          <div ng-hide="ready"><div class="img-loader"></div></div>
+
+          <div ng-if="ready && !showAdvanced" align="center">
+
+                <!-- Not logged in yet -->
+                <div ng-if="!appConfig.staff_code && appConfig.account && leadgen_enabled" class="container-fluid" style="max-width: 400px;" align="center">
+                    <div class="row" align="center">
+                        <div class="col-md-12">
+                            <div ng-if="$parent.$parent.loginError" class="alert alert-danger text-left">
+                                Your password and/or username were incorrect.
+                            </div>
+
+                            <div align="left">
+                                <h3>Login</h3>
+                            </div>
+
+                            <form novalidate="novalidate" ng-submit="attemptLogin()">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" ng-model="$parent.$parent.leadgenUsername" force-open-keyboard="" placeholder="Staff Code">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" ng-model="$parent.$parent.leadgenPassword" force-open-keyboard="" placeholder="Password">
+                                </div>
+                                <button type="submit" class="btn btn-block login">
+                                  Login
+                                </button>
+                             </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- missing config -->
+                <div ng-if="!appConfig.account && leadgen_enabled" align="center">
+                  Leadgen config is missing. Please correct this before continuing.
+                </div>
+
+                <!-- Logged in mode -->
+                <div ng-if="appConfig.staff_code && leadgen_enabled" align="center" style="margin-top: 20px;">
+                    <div>Logged in as <span style="font-weight:bold;">{{ appConfig.staff_code }} </span> (<a href="javascript:void(0);" ng-click="logout()" style="text-decoration:underline; color: #fff;">logout</a>)</div>
+                    <a class="btn" ng-class="{'btn-danger': appConfig.staff_code == 'test', 'login': appConfig.staff_code != 'test'}" ng-if="ready" href="javascript:void(0);" ng-click="loadPackage()" style="margin-top: 10px;">
+                      <i ng-if="appConfig.staff_code == 'test'" class="glyphicon glyphicon-warning-sign"></i> Start Application <span ng-if="appConfig.staff_code == 'test'">as Test</span>
+                    </a>
+                    <div ng-if="appConfig.staff_code == 'test'" style="font-size: 10px; margin-top: 10px;">WARNING: you are logged in as test! This isn't good.</div>
+                </div>
+
+                <!-- not using leadgen -->
+                <a class="btn login" ng-if="ready && !leadgen_enabled" href="javascript:void(0);" ng-click="loadPackage()" style="margin-top: 10px;" align="center">
+                  Start Application
+                </a>
+
+          </div>
+
+          <div ng-if="!appConfig.account && leadgen_enabled">
+<!-- ngInclude: 'components/leadgen-config/leadgenConfig.html' -->
+<div align="center">
+  <div ng-controller="LeadgenConfigController">
+    <div class="alert alert-success" ng-if="message">
+        {{message}}
+    </div>
+    <div class="alert alert-danger" ng-if="errorMessage">
+        {{errorMessage}}
+    </div>
+
+    <!--
+    show loading if nothing is ready yet
+    -->
+    <div ng-hide="ready"><div class="img-loader"></div></div>
+    <!--
+    show error if something went wrong
+    -->
+    <div ng-hide="appConfig.account && !dismiss">
+<!-- ngInclude: 'generic-error.html' -->
+<div ng-if="error" class="error-container" style="margin: 30px auto;" align="center">
+  <i class="fa fa-exclamation-triangle" style="font-size: 50px; color: #b14242;" aria-hidden="true"></i>
+  <br>There was an error, you may be offline.
+</div>
+<!--/ngInclude: 'generic-error.html' -->
+</div>
+    <!--
+    show this if we have already set a config up
+    and it hasnt been dismissed yet
+    -->
+
+    <!-- <a class="btn" ng-if="ready && appConfig.account && !dismiss && leadgen_enabled" ng-click='changeConfig()'>
+      <span class='glyphicon glyphicon-refresh'></span>
+      Change Leadgen Config
+    </a> -->
+
+    <!--
+    if we have already setup the appConfig and this hasnt been dismissed yet
+    dont show it.
+    the "changeConfig" function is responsible for letting this appear.
+    -->
+    <div ng-hide="!ready">
+      <h3> Collection Method</h3>
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="wheelstand"> Wheelstand
+      </label>
+
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="kiosk"> Kiosk
+      </label>
+
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="custom"> <input type="text" class="input" style="color:#000;" name="custom" force-open-keyboard="" ng-model="appConfig.customCmethod">
+      </label>
+
+      <h3> Account </h3>
+      <div ng-class="{hide: lockedAccount}">
+        <select chosen="" name="account" ng-change="changeAccount()" ng-model="currentAccount" disable-search="true" no-results-text="'Could not find any accounts'" ng-options="account as account.account_name for account in accounts track by account.account_code">
+          <option value=""></option>
+        </select>
+      </div>
+      <div ng-show="lockedAccount" align="center">{{ currentAccount.account_name }}</div>
+
+      <div ng-show="currentAccount && currentAccount.account_name">
+        <h3>Application</h3>
+        <div ng-class="{hide: lockedApplication}">
+          <select chosen="" name="application" ng-change="changeApplication()" ng-model="currentApplication" disable-search="true" no-results-text="'Could not find any applications'" ng-options="application as application.application_name for application in applications track by application.application_code">
+            <option value=""></option>
+          </select>
+        </div>
+        <div ng-show="lockedApplication">
+          {{ currentApplication.application_name }}
+        </div>
+      </div>
+
+      <!--<div ng-show="currentAccount && currentAccount.account_name">
+        <h3>Device Code</h3>
+        <select chosen
+          name="device_code"
+          ng-change="changeDeviceCode()"
+          ng-model="$parent.currentDeviceCode"
+          no-results-text="'Could not find any device codes'"
+          ng-options="deviceCode as deviceCode.device_code for deviceCode in deviceCodes">
+          <option value=""></option>
+        </select>
+      </div> -->
+
+      <div ng-show="currentApplication && currentApplication.application_code">
+        <h3>Event</h3>
+        <select chosen="" name="event" ng-change="changeEvent()" ng-model="currentEvent" disable-search="true" no-results-text="'Could not find any events'" ng-options="event as event.name for event in events track by event.id">
+          <option value=""></option>
+        </select>
+      </div>
+
+      <br>
+
+      <button ng-click="saveConfig()" class="btn" ng-class="{'btn-disabled': !(currentApplication && currentApplication.application_code) || !(currentEvent && currentEvent.id)}">Save Changes</button>
+    </div>
+  </div>
+
+</div>
+<!--/ngInclude: 'components/leadgen-config/leadgenConfig.html' -->
+</div>
+          <div ng-if="leadgen_enabled">
+<!-- ngInclude: 'admin-app-config.html' -->
+<div style="margin: 30px; max-width: 400px" align="center" ng-if="!showAdvanced">
+
+    <ul ng-if="appConfig.account && leadgen_enabled" style="list-style:none; margin: 0; padding: 0;" align="left">
+      <div>
+<!-- ngInclude: 'components/leadgen-event-config/leadgenEventConfig.html' -->
+<div ng-controller="LeadgenEventConfigController" class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Select an Event</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div ng-hide="ready" align="center"><div class="img-loader"></div></div>
+    </div>
+
+    <div class="row" ng-show="ready">
+        <div class="col-md-12">
+            <table width="100%" ng-show="ready">
+                <tr ng-if="!!testEvent">
+                    <td>
+                        <div class="alert alert-danger text-center">
+                            <i class="glyphicon glyphicon-warning-sign ng-scope"></i> Not good! You have chosen a test event!
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select chosen="" name="event" ng-change="saveEvent()" ng-model="currentEvent" disable-search="true" no-results-text="'Could not find any events'" ng-options="event as event.name for event in events track by event.id">
+                          <option value=""></option>
+                        </select>
+                    </td>
+                    <!--<td>&nbsp;</td>
+                    <td width="40">
+                        <button class="btn btn-small btn-block" ng-class="{'btn-disabled': !currentEvent}" ng-click="saveEvent()" ng-disabled="!currentEvent">Save</button>
+                    </td>-->
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-show="ready" style="margin-top: 15px">
+        <div class="col-md-4">
+            <a class="btn btn-block" ng-if="ready && appConfig.account && !dismiss && leadgen_enabled" ng-click="refresh()">
+              <span class="glyphicon glyphicon-refresh"></span>
+            </a>
+        </div>
+        <div class="col-md-8">
+            <span style="font-size: 0.75em;">Reconnect to the server to get new user data</span>
+        </div>
+    </div>
+
+    <div class="row" ng-show="ready" style="margin-top: 15px">
+        <div class="col-md-12 leadgen-admin-c-method" align="center">
+            <span><strong>{{ collection_method }}</strong> MODE</span>
+        </div>
+    </div>
+
+</div>
+<!--/ngInclude: 'components/leadgen-event-config/leadgenEventConfig.html' -->
+</div>
+    </ul>
+
+    <span ng-if="!appConfig.account">
+       <div class="error-container" style="margin: 30px auto;" align="center">
+          <i class="fa fa-exclamation-triangle" style="font-size: 150px; color: #b14242;" aria-hidden="true"></i>
+          <br>No config was detected!
+      </div>
+    </span>
+</div>
+<!--/ngInclude: 'admin-app-config.html' -->
+</div>
+    </div>
+
+    <div ng-if="showAdvanced">
+<!-- ngInclude: 'components/advanced-options/advancedOptionsTemplate.html' -->
+<div class="options-area" ng-controller="AdvancedOptionsController as vm">
+  <h2>Advanced</h2>
+
+  <div align="center" ng-if="vm.onWindows">
+    <span class="label" ng-class="{'label-success': vm.startedViaBat, 'label-danger': !vm.startedViaBat}">{{ vm.startedViaBat ? 'Started via bat' : 'Not started via bat!' }}</span>
+  </div>
+
+  <div class="advanced-pills">
+    <details ng-if="boot_enabled">
+      <summary>Start Application on System Boot</summary>
+      <div class="advanced-pill-content">
+        <div>
+<!-- ngInclude: 'components/app-auto-booter/appAutoBooter.html' -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12" ng-controller="appAutoBooterController as vm" ng-class="{dim: !vm.ready}">
+            <form class="form-inline" ng-submit="vm.save();">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="alert alert-success" ng-if="vm.message">
+                            {{vm.message}}
+                        </div>
+                        <div class="alert alert-danger" ng-if="vm.errorMessage">
+                            {{vm.errorMessage}}
+                        </div>
+                        <div class="form-group">
+                            <div class="form-label">
+                                Auto-start app when device boots?
+                            </div>
+                            <label style="margin-right: 70px">
+                                <input type="radio" ng-model="vm.enabled" value="1"> Yes
+                            </label>
+                            <label>
+                                <input type="radio" ng-model="vm.enabled" value="0"> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center col-xs-12">
+                        <br>
+                        <button type="submit" class="btn">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--/ngInclude: 'components/app-auto-booter/appAutoBooter.html' -->
+</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Skip PIN Screen on Launch</summary>
+      <div class="advanced-pill-content">
+          <div>
+<!-- ngInclude: 'components/app-config/appConfig.html' -->
+<div ng-controller="AppConfigController">
+
+    <div ng-if="flashMessage" class="alert alert-warning">
+        {{ flashMessage }}
+    </div>
+
+    <div align="center">
+        <div ng-hide="ready" align="center"><div class="img-loader"></div></div>
+    </div>
+
+    <div ng-hide="!ready">
+        <label style="margin: 5px auto 25px;">
+            <input type="checkbox" ng-model="appConfig.autostart" name="autostart"> Don't show the PIN screen when the app starts
+        </label>
+
+        <br>
+
+        <div align="center">
+            <a class="btn" align="center" ng-click="saveConfig()" type="button">Save</a>
+        </div>
+    </div>
+</div>
+<!--/ngInclude: 'components/app-config/appConfig.html' -->
+</div>
+      </div>
+    </details>
+
+    <details ng-hide="!timeouts_enabled">
+      <summary>Inactivity Timeout</summary>
+      <div class="advanced-pill-content">
+        <div>
+<!-- ngInclude: 'components/inactivity-timeout-config/timeoutConfig.html' -->
+<!-- timeoutConfig.html -->
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12" ng-controller="TimeoutConfigController as vm">
+            <form class="form-inline" ng-submit="vm.save();">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="alert alert-success" ng-if="vm.message">
+                            {{vm.message}}
+                        </div>
+                        <div class="alert alert-danger" ng-if="vm.errorMessage">
+                            {{vm.errorMessage}}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Timeout in Seconds
+                            </label>
+                            <input type="text" ng-model="vm.inactivityCheckSeconds" class="form-control" force-keyboard-input="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-center col-xs-12">
+                        <br>
+                        <button type="submit" class="btn">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--/ngInclude: 'components/inactivity-timeout-config/timeoutConfig.html' -->
+</div>
+      </div>
+    </details>
+
+    <details ng-hide="!packages_enabled">
+      <summary>Packages</summary>
+        <div class="advanced-pill-content" align="center">
+            <a style="margin-top: 10px;" class="btn" ng-click="getLatestPackage()" ng-class="{'btn-disabled': !$root.online}" align="center">Get Latest Package</a>
+        </div>
+    </details>
+
+    <details ng-if="leadgen_enabled">
+      <summary>Leadgen</summary>
+        <div class="advanced-pill-content" align="center">
+            <div>
+<!-- ngInclude: 'components/leadgen-config/leadgenConfig.html' -->
+<div align="center">
+  <div ng-controller="LeadgenConfigController">
+    <div class="alert alert-success" ng-if="message">
+        {{message}}
+    </div>
+    <div class="alert alert-danger" ng-if="errorMessage">
+        {{errorMessage}}
+    </div>
+
+    <!--
+    show loading if nothing is ready yet
+    -->
+    <div ng-hide="ready"><div class="img-loader"></div></div>
+    <!--
+    show error if something went wrong
+    -->
+    <div ng-hide="appConfig.account && !dismiss">
+<!-- ngInclude: 'generic-error.html' -->
+<div ng-if="error" class="error-container" style="margin: 30px auto;" align="center">
+  <i class="fa fa-exclamation-triangle" style="font-size: 50px; color: #b14242;" aria-hidden="true"></i>
+  <br>There was an error, you may be offline.
+</div>
+<!--/ngInclude: 'generic-error.html' -->
+</div>
+    <!--
+    show this if we have already set a config up
+    and it hasnt been dismissed yet
+    -->
+
+    <!-- <a class="btn" ng-if="ready && appConfig.account && !dismiss && leadgen_enabled" ng-click='changeConfig()'>
+      <span class='glyphicon glyphicon-refresh'></span>
+      Change Leadgen Config
+    </a> -->
+
+    <!--
+    if we have already setup the appConfig and this hasnt been dismissed yet
+    dont show it.
+    the "changeConfig" function is responsible for letting this appear.
+    -->
+    <div ng-hide="!ready">
+      <h3> Collection Method</h3>
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="wheelstand"> Wheelstand
+      </label>
+
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="kiosk"> Kiosk
+      </label>
+
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="custom"> <input type="text" class="input" style="color:#000;" name="custom" force-open-keyboard="" ng-model="appConfig.customCmethod">
+      </label>
+
+      <h3> Account </h3>
+      <div ng-class="{hide: lockedAccount}">
+        <select chosen="" name="account" ng-change="changeAccount()" ng-model="currentAccount" disable-search="true" no-results-text="'Could not find any accounts'" ng-options="account as account.account_name for account in accounts track by account.account_code">
+          <option value=""></option>
+        </select>
+      </div>
+      <div ng-show="lockedAccount" align="center">{{ currentAccount.account_name }}</div>
+
+      <div ng-show="currentAccount && currentAccount.account_name">
+        <h3>Application</h3>
+        <div ng-class="{hide: lockedApplication}">
+          <select chosen="" name="application" ng-change="changeApplication()" ng-model="currentApplication" disable-search="true" no-results-text="'Could not find any applications'" ng-options="application as application.application_name for application in applications track by application.application_code">
+            <option value=""></option>
+          </select>
+        </div>
+        <div ng-show="lockedApplication">
+          {{ currentApplication.application_name }}
+        </div>
+      </div>
+
+      <!--<div ng-show="currentAccount && currentAccount.account_name">
+        <h3>Device Code</h3>
+        <select chosen
+          name="device_code"
+          ng-change="changeDeviceCode()"
+          ng-model="$parent.currentDeviceCode"
+          no-results-text="'Could not find any device codes'"
+          ng-options="deviceCode as deviceCode.device_code for deviceCode in deviceCodes">
+          <option value=""></option>
+        </select>
+      </div> -->
+
+      <div ng-show="currentApplication && currentApplication.application_code">
+        <h3>Event</h3>
+        <select chosen="" name="event" ng-change="changeEvent()" ng-model="currentEvent" disable-search="true" no-results-text="'Could not find any events'" ng-options="event as event.name for event in events track by event.id">
+          <option value=""></option>
+        </select>
+      </div>
+
+      <br>
+
+      <button ng-click="saveConfig()" class="btn" ng-class="{'btn-disabled': !(currentApplication && currentApplication.application_code) || !(currentEvent && currentEvent.id)}">Save Changes</button>
+    </div>
+  </div>
+
+</div>
+<!--/ngInclude: 'components/leadgen-config/leadgenConfig.html' -->
+</div>
+        </div>
+    </details>
+
+     <details ng-repeat="tab in customTabs">
+       <summary>{{ tab.name }}</summary>
+       <div class="advanced-pill-content">
+          <div bind-html-compile="tab.template"></div>
+      </div>
+     </details>
+  </div>
+
+</div>
+<!--/ngInclude: 'components/advanced-options/advancedOptionsTemplate.html' -->
+</div>
+    <br>
+    <a href="javascript:void(0);" ng-click="showAdvanced = true" class="btn btn-small" ng-hide="showAdvanced">Advanced Options</a>
+    <a href="javascript:void(0);" ng-click="showAdvanced = false;" class="btn btn-small" ng-hide="!showAdvanced">Back</a>
+    <div>
+<!-- ngInclude: 'admin-exit.html' -->
+<div ng-controller="QuitApplicationController">
+    <!-- ng-controller="QuitApplicationController" -->
+    <a style="margin-top: 10px;" type="button" class="btn quit" ng-click="handleQuitApplication()">
+      <span class="glyphicon glyphicon-remove"></span>
+      Quit Application
+    </a>
+</div>
+<!--/ngInclude: 'admin-exit.html' -->
+</div>
+  </div>
+
+
+<!--   LEADS FORM -->
+  <div ng-if="currentPage == 'Leads' && leadgen_enabled" ng-controller="AdminLeadsController" class="leadgen-main-container-cell">
+
+    <h2 style="margin-bottom: 0;">All Leads</h2>
+
+    <!--
+      show loading if nothing is ready yet
+    -->
+    <div ng-hide="ready"><div class="img-loader"></div></div>
+
+    <!--
+      show error if something went wrong
+      $scope.error == true
+    -->
+    <div>
+<!-- ngInclude: 'generic-error.html' -->
+<div ng-if="error" class="error-container" style="margin: 30px auto;" align="center">
+  <i class="fa fa-exclamation-triangle" style="font-size: 50px; color: #b14242;" aria-hidden="true"></i>
+  <br>There was an error, you may be offline.
+</div>
+<!--/ngInclude: 'generic-error.html' -->
+</div>
+
+    <!--
+    A quick look at the status
+    of all leads
+    -->
+    <div align="center" class="lead-status" ng-if="ready">
+      <div class="lead-status-item">
+          <h1>{{ leadCounts.synced || 0 }}</h1>
+          <span>SYNCED LEADS</span>
+      </div>
+
+      <div class="lead-status-item">
+        <h1>{{ leadCounts.unsynced || 0 }}</h1>
+        <span>UNSYNCED LEADS</span>
+      </div>
+      <div align="center">
+        <a href="javascript:void(0);" ng-click="$root.leadgen_page = 'calendar'" class="btn btn-default btn-sm">Details</a>
+      </div>
+    </div>
+
+    <!--
+      synced breakdown by event_code
+    -->
+    <table ng-if="ready" class="lead-table lead-breakdown-table" width="100%">
+      <thead>
+        <th class="text-center">Event</th>
+        <th class="text-center">Synced</th>
+        <th class="text-center">Unsynced</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="event in leadCounts.byEvent">
+            <td>{{ event.event_code || 'Not Set' }}</td>
+            <td>{{ event.synced || 0 }}</td>
+            <td>{{ event.unsynced || 0 }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div ng-if="syncing" align="center">
+      Syncing leads, please wait...
+      <span>{{ currentSyncLead }}</span>
+    </div>
+
+    <!--
+     Lead sync area. Only shows if they are leads to sync
+    -->
+    <div ng-if="ready && leads && leads.length > 0">
+
+        <h2 style="margin: 60px auto 0;">Unsynced Leads</h2>
+
+        <button class="btn" ng-click="manualSync()">Sync Leads</button>
+
+        <!--
+        List of all the leads waiting to be synced
+        -->
+        <table ng-if="ready" width="100%" class="lead-table">
+          <thead>
+            <th>ID</th>
+            <th>Event Code</th>
+            <th>Captured</th>
+            <th>Synced</th>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>{{ leads[0]._id }}</td>
+              <td>{{ leads[0].event_code }}</td>
+              <td>{{ leads[0].captime }}</td>
+              <td>{{ leads[0].synced ? 'YES' : 'NO' }}</td>
+            </tr>
+            <tr ng-if="leads.length > 1">
+              <td colspan="4">
+                and {{ leads.length - 1}} more lead<span ng-if="(leads.length - 1) > 1">s</span> ...
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+    </div>
+
+    <div align="center" ng-if="ready && leads && leads.length == 0 && event && event.length > 0">
+      All leads synced.
+    </div>
+
+  </div>
+</div>
+<!--/ngInclude: 'admin-leads.html' -->
+</div>
+
+      <div ng-controller="PackageManagerController" class="footer">
+        <div>Application Version: {{version}}</div>
+        <span>Support phone number: 646-586-5076</span>
+      </div>
+
+    </div>
+</div>
+
+<div ng-controller="AdminTestOverlayController as vm" ng-show="vm.is_test && vm.overlayVisible" class="leadgen-admin-test-warning" align="center">
+  <h2>You are logged in as <strong>"test."</strong> <i class="fa fa-times" ng-click="vm.showOverlay(false)" style="cursor: pointer"></i></h2>
+  <span>Either the event or the username is 'test' related. This isn't good! Access the admin panel to fix this.</span>
+</div>
+
+<div ng-controller="AdminWebviewOverlay as vm" class="leadgen-admin-webview" ng-hide="vm.show_webview === false" ng-click="vm.closeWebview()"></div>
+
+<div class="leadgen-admin-button" ng-controller="AdminButtonController" ng-if="$root.leadgen_page != ''" ng-dblclick="showAdmin()"></div>

@@ -1,0 +1,62 @@
+
+
+<div ng-controller="LeadgenEventConfigController" class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Select an Event</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div ng-hide="ready" align="center"><div class="img-loader"></div></div>
+    </div>
+
+    <div class="row" ng-show="ready">
+        <div class="col-md-12">
+            <table width="100%" ng-show="ready">
+                <tr ng-if="!!testEvent">
+                    <td>
+                        <div class="alert alert-danger text-center">
+                            <i class="glyphicon glyphicon-warning-sign ng-scope"></i> Not good! You have chosen a test event!
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select chosen
+                          name="event"
+                          ng-change="saveEvent()"
+                          ng-model="currentEvent"
+                          disable-search="true"
+                          no-results-text="'Could not find any events'"
+                          ng-options="event as event.name for event in events track by event.id">
+                          <option value=""></option>
+                        </select>
+                    </td>
+                    <!--<td>&nbsp;</td>
+                    <td width="40">
+                        <button class="btn btn-small btn-block" ng-class="{'btn-disabled': !currentEvent}" ng-click="saveEvent()" ng-disabled="!currentEvent">Save</button>
+                    </td>-->
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-show="ready" style="margin-top: 15px">
+        <div class="col-md-4">
+            <a class="btn btn-block" ng-if="ready && appConfig.account && !dismiss && leadgen_enabled" ng-click='refresh()' >
+              <span class='glyphicon glyphicon-refresh'></span>
+            </a>
+        </div>
+        <div class="col-md-8">
+            <span style="font-size: 0.75em;">Reconnect to the server to get new user data</span>
+        </div>
+    </div>
+
+    <div class="row" ng-show="ready" style="margin-top: 15px">
+        <div class="col-md-12 leadgen-admin-c-method" align="center">
+            <span><strong>{{ collection_method }}</strong> MODE</span>
+        </div>
+    </div>
+
+</div>

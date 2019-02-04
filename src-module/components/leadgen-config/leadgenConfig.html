@@ -1,0 +1,110 @@
+<div align="center">
+  <div ng-controller="LeadgenConfigController">
+    <div class="alert alert-success" ng-if="message">
+        {{message}}
+    </div>
+    <div class="alert alert-danger" ng-if="errorMessage">
+        {{errorMessage}}
+    </div>
+
+    <!--
+    show loading if nothing is ready yet
+    -->
+    <div ng-hide="ready"><div class="img-loader"></div></div>
+    <!--
+    show error if something went wrong
+    -->
+    <div ng-hide="appConfig.account && !dismiss" ng-include="'generic-error.html'"></div>
+    <!--
+    show this if we have already set a config up
+    and it hasnt been dismissed yet
+    -->
+
+    <!-- <a class="btn" ng-if="ready && appConfig.account && !dismiss && leadgen_enabled" ng-click='changeConfig()'>
+      <span class='glyphicon glyphicon-refresh'></span>
+      Change Leadgen Config
+    </a> -->
+
+    <!--
+    if we have already setup the appConfig and this hasnt been dismissed yet
+    dont show it.
+    the "changeConfig" function is responsible for letting this appear.
+    -->
+    <div ng-hide="!ready">
+      <h3> Collection Method</h3>
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="wheelstand" /> Wheelstand
+      </label>
+
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="kiosk" /> Kiosk
+      </label>
+
+      <label>
+        <input type="radio" name="c_method" ng-model="appConfig.collection_method" value="custom" /> <input type="text" class="input" style="color:#000;" name="custom" force-open-keyboard ng-model="appConfig.customCmethod" />
+      </label>
+
+      <h3> Account </h3>
+      <div ng-class="{hide: lockedAccount}">
+        <select chosen
+          name="account"
+          ng-change="changeAccount()"
+          ng-model="currentAccount"
+          disable-search="true"
+          no-results-text="'Could not find any accounts'"
+          ng-options="account as account.account_name for account in accounts track by account.account_code">
+          <option value=""></option>
+        </select>
+      </div>
+      <div ng-show="lockedAccount" align="center">{{ currentAccount.account_name }}</div>
+
+      <div ng-show="currentAccount && currentAccount.account_name">
+        <h3>Application</h3>
+        <div ng-class="{hide: lockedApplication}">
+          <select chosen
+            name="application"
+            ng-change="changeApplication()"
+            ng-model="currentApplication"
+            disable-search="true"
+            no-results-text="'Could not find any applications'"
+            ng-options="application as application.application_name for application in applications track by application.application_code">
+            <option value=""></option>
+          </select>
+        </div>
+        <div ng-show="lockedApplication">
+          {{ currentApplication.application_name }}
+        </div>
+      </div>
+
+      <!--<div ng-show="currentAccount && currentAccount.account_name">
+        <h3>Device Code</h3>
+        <select chosen
+          name="device_code"
+          ng-change="changeDeviceCode()"
+          ng-model="$parent.currentDeviceCode"
+          no-results-text="'Could not find any device codes'"
+          ng-options="deviceCode as deviceCode.device_code for deviceCode in deviceCodes">
+          <option value=""></option>
+        </select>
+      </div> -->
+
+      <div ng-show="currentApplication && currentApplication.application_code">
+        <h3>Event</h3>
+        <select chosen
+          name="event"
+          ng-change="changeEvent()"
+          ng-model="currentEvent"
+          disable-search="true"
+          no-results-text="'Could not find any events'"
+          ng-options="event as event.name for event in events track by event.id">
+          <option value=""></option>
+        </select>
+      </div>
+
+      <br />
+
+      <button ng-click="saveConfig()" class="btn" ng-class="{'btn-disabled': !(currentApplication && currentApplication.application_code) || !(currentEvent && currentEvent.id)}">Save Changes</button>
+    </div>
+  </div>
+
+</div>

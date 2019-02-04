@@ -1,0 +1,29 @@
+<script id="customMonthCell.html" type="text/ng-template">
+  <div
+      class="cal-month-day"
+      ng-class="{
+        'cal-day-outmonth': !day.inMonth,
+        'cal-day-inmonth': day.inMonth,
+        'cal-day-weekend': day.isWeekend,
+        'cal-day-past': day.isPast,
+        'cal-day-today': day.isToday,
+        'cal-day-future': day.isFuture,
+        'cal-day-selected': vm.dateRangeSelect && vm.dateRangeSelect.startDate <= day.date && day.date <= vm.dateRangeSelect.endDate,
+        'cal-day-open': dayIndex === vm.openDayIndex
+      }">
+
+    <span
+      class="pull-right"
+      data-cal-date
+      ng-bind="day.label">
+    </span>
+
+    <small class="counts" style="position: absolute; bottom: 0; left: 0; padding: 10px" ng-if="day.events.length">
+        {{ day.events[0].title.total }} <span>LEAD<span ng-if="day.events[0].title.total > 1">S</span></span>
+        <div>
+          <span ng-repeat="(key, value) in day.events[0].title.events" class="label label-success" >{{ key }}</span>
+        </div>
+    </small>
+
+  </div>
+</script>

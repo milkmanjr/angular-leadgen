@@ -1,0 +1,180 @@
+<!doctype html>
+<html ng-app="demo">
+	<head>
+		<meta charset="utf-8">
+		<title>Spinifex Electron boilerplate</title>
+		<link rel="stylesheet" href="css/index.css">
+        <link rel="stylesheet" href="../tests/lib/chosen/public/chosen.css" />
+        <link rel="stylesheet" href="../bower_components/bootstrap-css-only/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../tests/lib/components-font-awesome/css/font-awesome.css" />
+
+        <script src="../tests/lib/jquery/jquery.js"></script>
+        <script src="../tests/lib/angular/angular.js"></script>
+        <script src="../dist-module/angular-leadgen-min.js"></script>
+        <link rel="stylesheet" href="../dist-module/angular-leadgen.css" />
+        <script>
+            var app = angular.module('demo', ['angular-leadgen']);
+
+            app.controller('UseController', function ($scope) {
+                //alert('crazy');
+            });
+
+            app.config(['LeadServiceProvider', function (LeadServiceProvider) {
+
+                LeadServiceProvider.setConfig({
+                    //disable_leads: true,
+                    //disable_packages: true,
+                    home_path: require('path').join(__dirname, './'),
+
+                    inactivity_callback: ($injector) => {
+                        var $rootScope = $injector.get("$rootScope");
+                        $rootScope.page = 'donuts';
+                    },
+                    custom_tabs: [{
+                        name: 'Fun Page',
+                        template: '<div><h1>hello world</h1></div>'
+                    },{
+                        name: "Not so fun",
+                        template: '<div ng-include=\'"testing.html"\' ng-controller="UseController"></div>'
+                    }],
+                    device_code: 'honda_master',
+                    vehicle_make: 'honda',
+                    staticAccounts: [{
+                        "account_id": "11",
+                        "account_name": "Honda Auto",
+                        "account_code": "75f831afb84a947277df258f6359c7ea",
+                        "account_timezone": "UTC",
+                        "account_active": "1"
+                    }],
+                    staticApplications: [{
+                        application_id: "50",
+                        application_name: "Honda Wheelstand",
+                        application_code: "7da003932cb1f52a624d1542c453de20",
+                        application_version: "1.0",
+                        application_notes: null,
+                        map_events: "304,24,70,15,32,78,82,51,41,54,25,59,62,67,72,27,63,64,79,44,194,83,23,74,73,157,45,8,35,196,57,68,34,29,75,512,219,1676,42,22,52,46,65,71,217,80,77,81,156,17,69,30,47,222,167,58,224,61,195,53,56,218,66,18,36,33,37,26,16,152,39,60,1151,48,220,28,55,163,223,43,38,76,50,49",
+                        map_formats: "42,49",
+                        map_accounts: "11"
+                    }],
+                    sweepstakes_base: 'http://public.gpjconnect.com/honda/photoapp',
+                    //device_code: 'honda_master',
+                   // vehicle_make: 'honda',
+                    browser_offline_callback: function ($injector) {
+                        alert('not opening, offline');
+                    }
+                });
+            }]);
+
+            app.constant('config', {
+                default_page: 'cars'
+            });
+
+            app.controller('DemoController', ['LeadService', '$scope', '$log', "LeadgenFormHelper", 'PubSub', 'ConfigService',
+                function (LeadService, $scope, $log, LeadgenFormHelper, PubSub, ConfigService) {
+
+                    $scope.zip_code_info = LeadgenFormHelper.getZipData('33415');
+                    $scope.states        = LeadgenFormHelper.states;
+                    $scope.formData      = {};
+                    $scope.cars;
+                    $scope.survey_questions  = [];
+
+                    $scope.env_variables = process.env;
+
+                    PubSub.subscribe('leadgen.configUpdate', (data) => {
+                        $scope.leadgen_config_updated = (new Date()).getTime();
+                        $log.debug('leadgen changed detected =>', data);
+                    });
+
+                    LeadgenFormHelper.getAvailableCars({email: true})
+                        .then((cars) => {
+                            $scope.cars = cars;
+                        });
+
+                    LeadgenFormHelper.getSurveyQuestions()
+                        .then((questions) => {
+                            $scope.survey_questions = questions || [];
+                        });
+
+                    $scope.saveLead = function () {
+                        LeadService.save({
+                            params: $scope.formData
+                        }).then(()=> {
+                            $scope.formData = {};
+                            alert('lead successfully saved');
+                        })
+                    };
+
+                    $scope.openUrl = function (url) {
+                        let electron = require('electron');
+                        electron.ipcRenderer.send('open-url', {url: url});
+                    };
+
+                    $scope.setReset = function (value) {
+                        let electron = require('electron');
+                        electron.ipcRenderer.send('set-reset-cookies', value);
+                        $scope.resetCookies = value;
+                    }
+            }]);
+        </script>
+	</head>
+	<body>
+        <!-- build:remove -->
+        <script>
+            if (process.env.BROWSER_SYNC_CLIENT_URL) {
+                const current = document.currentScript;
+                const script = document.createElement('script');
+                script.src = process.env.BROWSER_SYNC_CLIENT_URL;
+                script.async = true;
+                current.parentNode.insertBefore(script, current);
+            }
+        </script>
+        <!-- endbuild -->
+
+
+
+      <leadgen-admin></leadgen-admin>
+
+      <!-- components that live outside
+      of the leadgen-admin element
+      that we want to test -->
+       <div ng-controller="DemoController">
+
+            <a href="javascript:void(0);" leadgen-sweepstakes-overlay leadgen-analytics-track="{main_nav: '', section:'sweepstakes', subsection: 'Open Sweepstakes Overlay'}">Open Sweepstakes Overlay</a>
+            <br />
+            <a href="javascript:void(0);" monroney-overlay>Monroney Overlay</a>
+
+            <h1>{{ $root.page || 'page not set yet' }}</h1>
+
+            <div>{{ zip_code_info }}</div>
+            <div>{{ states }}</div>
+            <div>ONLINE? {{$root.online ? 'true' : 'false'}}
+                <div>Should the cookies be reset? <strong>{{ resetCookies ? 'true' : 'false '}}</strong></div>
+                <a href="javascript:void(0);" class="btn" ng-click="setReset(true)">Reset</a>
+
+            <div>Last config update: {{ leadgen_config_updated }}</div>
+
+            <h3>Form</h3>
+
+            <h5>Suvery questions</h5>
+
+            {{ survey_questions }}
+
+            <div>
+                <h5>The cars</h5>
+                <ul>
+                    <li ng-repeat="car in cars">{{ car.vehicle_name }}</li>
+                </ul>
+            </div>
+
+            <a href="javascript:void(0);" url-opener='https://automobiles.honda.com/tools/current-offers'>Open a url</a>
+
+            <form ng-submit="saveLead()">
+                <label> First Name <input type="text" ng-model="formData.name_first" prevent-for-names /></label>
+                <label> Last Name <input type="text" ng-model="formData.name_last" prevent-for-names /></label>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+       </div>
+
+	</body>
+</html>
+

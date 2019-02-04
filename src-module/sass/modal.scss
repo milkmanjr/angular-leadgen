@@ -1,0 +1,33 @@
+.official-rules-modal {
+
+    .modal-header {
+        background: #002c45;
+        color: #fff;
+        text-transform: uppercase;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+
+        .close {
+            margin-left: auto;
+            i.fa.fa-close {
+                color: #fff;
+            }
+        }
+    }
+
+    .modal-body {
+        .official-rules {
+            max-height: 300px;
+            overflow: auto;
+            padding: 10px;
+            box-sizing: border-box;
+            color: black;
+
+            a, button {
+                pointer-events: none;
+            }
+        }
+    }
+
+}

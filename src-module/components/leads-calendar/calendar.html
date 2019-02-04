@@ -1,0 +1,62 @@
+<div ng-include="'components/leads-calendar/day-cell.html'"></div>
+
+<div ng-controller="LeadsCalendarController as vm" class="leadgen-admin-calendar">
+    <div class="leadgen-admin-calendar__inner" ng-class="{in_dayview: vm.dayMode}">
+        <table class="leadgen-admin-calendar__header" width="100%">
+            <tr>
+                <td width="250" align="left">
+                    <button
+                        class="btn btn-sm"
+                        decrement="vm.calendarView"
+                        ng-hide="vm.dayMode"
+                        mwl-date-modifier
+                        date="vm.viewDate"
+                        ng-click="vm.dateChanged()"
+                        ><i class="fa fa-chevron-left"></i></button>
+                     <button
+                    class="btn btn-sm"
+                    ng-if="vm.dayMode"
+                    ng-click="vm.dayMode = false;">
+                        <i class="fa fa-chevron-left"></i> Back to Full Calendar
+                    </button>
+                </td>
+                <td align="center"><h2 class="text-center">{{ vm.calendarTitle }}</h2></td>
+                <td width="250" align="right">
+                    <button ng-click="$root.leadgen_page = ''" class="btn btn-sm btn-danger"><i class="fa fa-close"></i> Close</button>
+                    <button
+                        class="btn btn-sm"
+                        increment="vm.calendarView"
+                        ng-hide="vm.dayMode"
+                        mwl-date-modifier
+                        date="vm.viewDate"
+                        ng-click="vm.dateChanged()">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                </td>
+            </tr>
+        </table>
+
+        <div
+            class="leadgen-admin-calendar__dayview"
+            ng-if="vm.dayMode"
+            ng-include="'components/leads-calendar/day.html'"></div>
+
+        <mwl-calendar
+            events="vm.events"
+            view="vm.calendarView"
+            view-title="vm.calendarTitle"
+            view-date="vm.viewDate"
+            on-event-click="vm.eventClicked(calendarEvent)"
+            on-timespan-click="vm.onTimespanClick(calendarDate)"
+            on-event-times-changed="vm.eventTimesChanged(calendarEvent); calendarEvent.startsAt = calendarNewEventStart; calendarEvent.endsAt = calendarNewEventEnd"
+            cell-is-open="vm.cellIsOpen"
+            day-view-start="06:00"
+            day-view-end="22:59"
+            day-view-split="30"
+            custom-template-urls="{calendarMonthCell: 'customMonthCell.html'}"
+            cell-modifier="vm.modifyCell(calendarCell)"
+            ng-show='!vm.dayMode'
+            cell-auto-open-disabled="true">
+        </mwl-calendar>
+    </div>
+</div>
